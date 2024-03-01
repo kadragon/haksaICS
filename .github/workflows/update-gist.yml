@@ -21,7 +21,10 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm install && apt-get install jq -y
+        run: npm install
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Generate Result
         run: node index.js > events.ics
