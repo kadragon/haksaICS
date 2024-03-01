@@ -20,6 +20,9 @@ jobs:
           node-version: "20"
           cache: "npm"
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Generate Result
         run: node index.js > result.ics
 
