@@ -27,7 +27,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Generate Result
-        run: node index.js > events.ics
+        run: node src/index.js > events.ics
 
       - name: Update Gist
         env:
