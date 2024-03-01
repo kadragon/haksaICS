@@ -1,0 +1,42 @@
+name: Update Gist
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "0 0 * * *" # 매일 자정에 실행
+  workflow_dispatch:
+
+jobs:
+  update-gist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Generate Result
+        run: node index.js > result.ics
+
+      - name: Update Gist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIST_TOKEN }}
+        run: |
+          GIST_ID=936ee41f20486d76a70b79a7163041ef
+          FILENAME=result.ics
+          CONTENT=$(cat $FILENAME)
+          curl -X PATCH https://api.github.com/gists/$GIST_ID \
+          -H "Authorization: token $GITHUB_TOKEN" \
+          -d @- << EOF
+          {
+            "files": {
+              "$FILENAME": {
+                "content": "$CONTENT"
+              }
+            }
+          }

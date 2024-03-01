@@ -1,10 +1,11 @@
 const parseCalendar = require("./parseCalendar");
 const createICS = require("./createICS");
-const fs = require("fs");
 
 async function makeICSContents() {
-  const data = await parseCalendar(2024);
-  fs.writeFileSync("ics/events.ics", createICS(data));
+  const nowYear = new Date().getFullYear();
+
+  const data = await parseCalendar(nowYear);
+  console.log(createICS(data));
 }
 
 makeICSContents();
