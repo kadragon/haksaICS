@@ -5,8 +5,8 @@ function createUID(date, text) {
   return crypto.createHash("md5").update(`${date}-${text}`).digest("hex");
 }
 
-function getUTCDate() {
-  const now = new Date();
+function getUTCDate(startDate) {
+  const now = new Date(startDate);
   return now.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
 }
 
@@ -23,7 +23,7 @@ CALSCALE:GREGORIAN
   const icsEvents = events
     .map((event) => {
       const uid = createUID(event.startDate, event.text);
-      const dtstamp = getUTCDate();
+      const dtstamp = getUTCDate(event.startDate);
       const dtStart = event.startDate.replace(/-/g, "");
       const dtEnd = event.endDate.replace(/-/g, "");
       // Note: DTEND in iCalendar is exclusive, so for single day events, it should be the next day
