@@ -24,22 +24,19 @@ jobs:
         run: npm install
 
       - name: Generate Result
-        run: node index.js > result.ics
+        run: node index.js > events.ics
 
       - name: Update Gist
         env:
           GITHUB_TOKEN: ${{ secrets.GIST_TOKEN }}
         run: |
           GIST_ID=936ee41f20486d76a70b79a7163041ef
-          FILENAME=result.ics
+          FILENAME=events.ics
           CONTENT=$(cat $FILENAME)
-          curl -X PATCH https://api.github.com/gists/$GIST_ID \
-          -H "Authorization: token $GITHUB_TOKEN" \
-          -d @- << EOF
-          {
-            "files": {
-              "$FILENAME": {
-                "content": "$CONTENT"
-              }
-            }
-          }
+          curl -L \
+          -X PATCH \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer $GITHUB_TOKEN" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          https://api.github.com/gists/$GIST_ID \
+          -d '{"description":"An updated gist description","files":{"events.ics":{"content":"$CONTENT"}}}'
