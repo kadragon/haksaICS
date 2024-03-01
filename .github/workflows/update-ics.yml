@@ -1,0 +1,30 @@
+name: Update ICS File
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # 매일 자정에 실행
+
+jobs:
+  update-ics:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14" # 프로젝트에 맞는 Node.js 버전 사용
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate ICS File
+        run: node index.js # ICS 파일을 생성하는 명령어
+
+      - name: Commit and push if changes
+        run: |
+          git config --global user.email "kadragon@knue.ac.kr"
+          git config --global user.name "kangdonguk"
+          git add -A
+          git commit -m "Automatically update ICS file" -a || exit 0
+          git push

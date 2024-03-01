@@ -4,7 +4,7 @@ const fs = require("fs");
 
 async function makeICSContents() {
   const data = await parseCalendar(2024);
-  fs.writeFileSync("events.ics", createICS(data));
+  fs.writeFileSync("ics/events.ics", createICS(data));
 }
 
 makeICSContents();
