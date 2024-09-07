@@ -1,33 +1,29 @@
 const crypto = require("crypto");
 
-const createUID = (date, text) =>
+const createUid = (date, text) =>
   crypto.createHash("md5").update(`${date}-${text}`).digest("hex");
 
-const getUTCDate = () =>
+const getCurrentUTC = () =>
   new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
 
-const formatDate = (date) => date.replace(/-/g, "");
+const formatDate = (date) => date.replace(/[-]/g, ""); // Hyphen removal is sufficient here
 
 const formatSummary = (event) => {
-  const startDate = new Date(event.startDate);
-  const endDate = new Date(event.endDate);
-  let summary = event.text;
+  const { title, startDate, endDate } = event;
+  const start = new Date(startDate);
+  const end = new Date(endDate);
 
-  // 시작 날짜와 종료 날짜가 다를 경우, 종료 날짜를 요약에 추가
-  if (endDate > startDate) {
-    const endDateFormatted = endDate
-      .toISOString()
-      .slice(5, 10)
-      .replace(/-/g, ".");
-    summary += ` (~${endDateFormatted})`;
-  }
+  const endFormatted =
+    end > start
+      ? ` (~${end.toISOString().slice(5, 10).replace(/-/g, ".")})`
+      : "";
 
-  return summary;
+  return `${title}${endFormatted}`;
 };
 
 const eventToICS = (event) => {
-  const uid = createUID(event.startDate, event.text);
-  const dtstamp = getUTCDate();
+  const uid = createUid(event.startDate, event.title);
+  const dtstamp = getCurrentUTC();
   const dtStart = formatDate(event.startDate);
   const summary = formatSummary(event);
 

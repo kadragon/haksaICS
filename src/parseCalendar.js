@@ -21,35 +21,36 @@ const parseDate = (dateText, currentYear) => {
  * @returns {Promise<Array>} 학사 일정을 담은 객체 배열.
  */
 async function parseCalendar(currentYear) {
-  const timestamp = new Date(`${currentYear}-03-01`).getTime() / 1000;
-  const url = `https://knue.ac.kr/icons/app/knue/schedule/schedule.php?w_date=${timestamp}`;
+  const url = `https://www.knue.ac.kr/www/selectSchdleWebList.do?key=542&searchY=${currentYear}&searchM=3`;
 
   try {
     const { data } = await axios.get(url);
     const $ = cheerio.load(data);
     const events = [];
 
-    $("table.sch3 tr").each(function () {
-      const dateText = $(this).find(".knue_date").text().trim();
-      if (dateText.length === 0) return;
+    $("table.more_year tbody tr").each(function () {
+      let startText,
+        endText = ["", ""];
 
-      const [startDateText, endDateText] = dateText.includes("~")
-        ? dateText.split("~")
-        : [dateText, dateText];
+      startText = $(this).find(".start").text().replace(/\s+/g, "").trim();
 
-      const startDate = parseDate(startDateText, currentYear);
-      const endDate = endDateText.includes(".")
-        ? parseDate(endDateText, currentYear)
-        : parseDate(`${startDate.split("-")[1]}-${endDateText}`, currentYear);
+      if (startText.length === 0) return;
 
-      const text = $(this)
-        .find("td.con1 a")
+      endText = $(this)
+        .find(".end")
         .text()
-        .trim()
-        .replace(dateText, "")
+        .replace(/\s+/g, "")
+        .replace("-", "")
         .trim();
 
-      events.push({ startDate, endDate, text });
+      if (endText.length === 0) endText = startText;
+
+      const title = $(this).find(".more_link").text().trim();
+
+      const startDate = parseDate(startText, currentYear);
+      const endDate = parseDate(endText, currentYear);
+
+      events.push({ startDate, endDate, title });
     });
 
     return events;
