@@ -6,7 +6,7 @@ const createUid = (date, text) =>
 const getCurrentUTC = () =>
   new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
 
-const formatDate = (date) => date.replace(/[-]/g, ""); // Hyphen removal is sufficient here
+const removeHyphens = (date) => date.replace(/-/g, ""); // 이름을 더 명확하게 변경
 
 const formatSummary = (event) => {
   const { title, startDate, endDate } = event;
@@ -24,7 +24,7 @@ const formatSummary = (event) => {
 const eventToICS = (event) => {
   const uid = createUid(event.startDate, event.title);
   const dtstamp = getCurrentUTC();
-  const dtStart = formatDate(event.startDate);
+  const dtStart = removeHyphens(event.startDate); // 함수 이름 변경 반영
   const summary = formatSummary(event);
 
   return `BEGIN:VEVENT
@@ -36,20 +36,19 @@ END:VEVENT
 `;
 };
 
-const createICS = (events) => {
-  const icsHeader = `BEGIN:VCALENDAR
+const ICS_HEADER = `BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Github@kadragon//haksaICS//KO
-X-WR-CALNAME:한국교원대학교 학사 일정
+X-WR-CALNAME:한국교원대학교 학사/행사 일정
 X-WR-TIMEZONE:Asia/Seoul
 X-WR-CALDESC:https://github.com/kadragon/haksaICS
 `;
 
-  const icsFooter = `END:VCALENDAR`;
+const ICS_FOOTER = `END:VCALENDAR`;
 
+const createICS = (events) => {
   const icsEvents = events.map(eventToICS).join("");
-
-  return `${icsHeader}${icsEvents}${icsFooter}`;
+  return `${ICS_HEADER}${icsEvents}${ICS_FOOTER}`;
 };
 
 module.exports = createICS;
